@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import os
+import string
 
 shutdown = False
 
@@ -26,8 +27,22 @@ class Project(object):
 class Menu(object):
   def __init__(self, items = dict()):
     self.items = items
+    self.commands = {'q':'Quit','a':'Add Project'}
     self.getch = _GetchUnix()
     self.error = None
+
+  def add_item(self, name, option = None):
+    if option is None:
+      # assign it a key
+      order = list(string.printable)
+      for k in order:
+        if not self.items.has_key(k) and not self.commands.has_key(k) and option is None: # very inefficient
+          option = k
+        
+    if self.items.has_key(option):
+      self.error = "Option %s already exists!" % option
+    else:
+      self.items[option] = name
   
   def display(self):
     os.system('clear')
@@ -35,10 +50,15 @@ class Menu(object):
     print "Projects"
     print "--------\n"
     if self.items:
-      for item in self.items:
-        print item
+      for key,value in sorted(self.items.iteritems()):
+        print "%s. %s" % (key,value)
     else:
       print "Nothing to see here"
+    
+    print "\n--------"
+    for key,value in sorted(self.commands.iteritems()):
+        print "%s. %s" % (key,value)
+    
     print ""
     print("cmd > "), #no newline
     self.command(self.getch())
@@ -49,7 +69,8 @@ class Menu(object):
       global shutdown
       shutdown = True
     if command in ('a','A'):
-      pass 
+      name = raw_input("New Project > ")
+      self.add_item(name)
 
 def loop(menu):
   while not shutdown:
