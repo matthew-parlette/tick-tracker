@@ -47,7 +47,7 @@ class Menu(object):
     except:
       self.items = items
     
-    self.commands = {'q':'Quit','a':'Add Project'}
+    self.commands = {'q':'Quit','a':'Add Project','d':'Delete Project'}
     self.getch = _GetchUnix()
     self.error = None
 
@@ -93,10 +93,13 @@ class Menu(object):
       
       #save the current item list
       pickle.dump( self.items, open( session_filename, "wb" ) )
-      
     if command in ('a','A'):
       name = raw_input("New Project > ")
       self.add_item(Project(name))
+    if command in ('d','D'):
+      print("Delete Project > "), #no newline
+      option = str(self.getch())
+      if self.items.has_key(option): del self.items[option]
     if self.items.has_key(command):
       print "command is %s" % command
       print "project found as %s" % self.items[command]
