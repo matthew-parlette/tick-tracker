@@ -3,6 +3,7 @@ import os
 import string
 
 shutdown = False
+tick_scale = 30 #minutes
 
 class _GetchUnix:
   def __init__(self):
@@ -20,9 +21,15 @@ class _GetchUnix:
     return ch
 
 class Project(object):
-  def __init__(self):
-    self.name = "Project"
+  def __init__(self,name):
+    self.name = name
     self.ticks = 0
+  
+  def __repr__(self):
+    return "%s (%s)" % (self.name,str(self.ticks * tick_scale))
+  
+  def tick(self, ticks = 1):
+    self.ticks += ticks
 
 class Menu(object):
   def __init__(self, items = dict()):
@@ -31,7 +38,7 @@ class Menu(object):
     self.getch = _GetchUnix()
     self.error = None
 
-  def add_item(self, name, option = None):
+  def add_item(self, project, option = None):
     if option is None:
       # assign it a key
       order = list(string.printable)
@@ -42,7 +49,7 @@ class Menu(object):
     if self.items.has_key(option):
       self.error = "Option %s already exists!" % option
     else:
-      self.items[option] = name
+      self.items[option] = project
   
   def display(self):
     os.system('clear')
@@ -70,7 +77,9 @@ class Menu(object):
       shutdown = True
     if command in ('a','A'):
       name = raw_input("New Project > ")
-      self.add_item(name)
+      self.add_item(Project(name))
+    #if self.items.has_key(command):
+      #pass
 
 def loop(menu):
   while not shutdown:
