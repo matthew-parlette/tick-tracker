@@ -78,8 +78,10 @@ class Menu(object):
     if command in ('a','A'):
       name = raw_input("New Project > ")
       self.add_item(Project(name))
-    #if self.items.has_key(command):
-      #pass
+    if self.items.has_key(command):
+      print "command is %s" % command
+      print "project found as %s" % self.items[command]
+      self.items[command].tick()
 
 def loop(menu):
   while not shutdown:
