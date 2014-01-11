@@ -54,6 +54,8 @@ class Menu(object):
   def display(self):
     os.system('clear')
     print "Error: %s" % self.error if self.error else ""
+    print "Tick Scale: %s minutes" % (tick_scale)
+    print "----------------------\n"
     print "Projects"
     print "--------\n"
     if self.items:
