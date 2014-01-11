@@ -1,9 +1,11 @@
 #!/usr/bin/python
 import os
 import string
+import cPickle as pickle
 
 shutdown = False
 tick_scale = 30 #minutes
+session_filename = "last_session.p"
 
 class _GetchUnix:
   def __init__(self):
@@ -28,12 +30,23 @@ class Project(object):
   def __repr__(self):
     return "%s (%s)" % (self.name,str(self.ticks * tick_scale))
   
+  def restart(self):
+    """Reset the project to 0 ticks."""
+    self.ticks = 0
+  
   def tick(self, ticks = 1):
     self.ticks += ticks
 
 class Menu(object):
   def __init__(self, items = dict()):
-    self.items = items
+    # if items is empty, try to load from session_filename
+    try:
+      self.items = pickle.load( open( session_filename, "rb" ) )
+      # clear all ticks from loaded items
+      for option, item in self.items.iteritems(): item.restart()
+    except:
+      self.items = items
+    
     self.commands = {'q':'Quit','a':'Add Project'}
     self.getch = _GetchUnix()
     self.error = None
@@ -77,6 +90,10 @@ class Menu(object):
     if command in ('q','Q'):
       global shutdown
       shutdown = True
+      
+      #save the current item list
+      pickle.dump( self.items, open( session_filename, "wb" ) )
+      
     if command in ('a','A'):
       name = raw_input("New Project > ")
       self.add_item(Project(name))
